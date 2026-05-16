@@ -102,6 +102,11 @@ select option{background:var(--cinza2);color:var(--branco);}
         <div class="field-error" id="err-estado_civil">Por favor, selecione o estado civil.</div>
       </div>
 
+      <div class="field">
+        <label>Empresa onde trabalha</label>
+        <input type="text" id="empresa" placeholder="Nome da empresa (opcional)" autocomplete="organization">
+      </div>
+
       <div class="section-title">📎 Documentos</div>
 
       <div class="field">
@@ -172,9 +177,12 @@ document.getElementById('end').addEventListener('change', function() {
 
 // ── Máscara celular ──────────────────────────────────────────────────────
 document.getElementById('celular').addEventListener('input', function() {
-  var v = this.value.replace(/\D/g, '').substring(0, 11);
-  if (v.length <= 10) v = v.replace(/(\d{2})(\d{4})(\d{0,4})/, '() -');
-  else                v = v.replace(/(\d{2})(\d{5})(\d{0,4})/, '() -');
+  var digits = this.value.replace(/[^0-9]/g, '').substring(0, 11);
+  if (digits.length === 0) { this.value = ''; return; }
+  var v = '(' + digits.substring(0, 2);
+  if (digits.length > 2) v += ') ' + digits.substring(2, digits.length > 10 ? 7 : 6);
+  if (digits.length > 6 && digits.length <= 10) v += '-' + digits.substring(6);
+  if (digits.length > 10) v = '(' + digits.substring(0,2) + ') ' + digits.substring(2,7) + '-' + digits.substring(7,11);
   this.value = v;
 });
 
@@ -249,6 +257,7 @@ async function enviar() {
       email:        document.getElementById('email').value.trim(),
       profissao:    document.getElementById('profissao').value.trim(),
       estado_civil: document.getElementById('estado_civil').value,
+      empresa:      document.getElementById('empresa').value.trim(),
       cnh_base64:   dadosCNH.base64,
       cnh_nome:     dadosCNH.nome,
       cnh_mime:     dadosCNH.mime,
